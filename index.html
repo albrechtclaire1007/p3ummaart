@@ -483,23 +483,29 @@ body{
   pointer-events:none;
   filter:drop-shadow(0 3px 3px rgba(0,0,0,.18));
 }
-
 .checkBtn{
   justify-self:center;
   border:none;
   border-radius:999px;
-  background:#62c96f;
+  background:var(--bar);
   color:#fff;
   font-family:'Schoulschrëft', Arial, sans-serif;
   font-size:clamp(1.4rem,3vw,2rem);
   padding:12px 44px;
   cursor:pointer;
-  box-shadow:0 6px 0 #3da94d;
+  box-shadow:0 6px 0 var(--barBorder);
 }
 
 .checkBtn:active{
   transform:translateY(3px);
-  box-shadow:0 3px 0 #3da94d;
+  box-shadow:0 3px 0 var(--barBorder);
+}
+
+.shopButtons{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  align-items:center;
 }
 
 .shopMessage{
@@ -612,9 +618,15 @@ body{
 
       <div class="bagDrop" id="bagDrop"></div>
 
-      <button class="checkBtn" id="checkShopping">
-        ✓ Kucken
-      </button>
+      <div class="shopButtons">
+  <button class="checkBtn" id="checkShopping">
+    ✓ Kucken
+  </button>
+
+  <button class="gameBtn" id="replayShopping" aria-label="Nei ufänken">
+    <img src="https://i.postimg.cc/ft30P4rQ/p3replay.png" alt="">
+  </button>
+</div>
 
       <div class="shopMessage" id="shopMessage"></div>
     </div>
@@ -1299,6 +1311,7 @@ function renderStalls(){
 
       compartment.className = "stallCompartment";
       compartment.dataset.slot = slotIndex;
+      compartment.dataset.simple = item.simple;
 
       for(let copyIndex = 0; copyIndex < 8; copyIndex++){
         const img = document.createElement("img");
@@ -1308,13 +1321,15 @@ function renderStalls(){
         img.alt = "";
         img.draggable = true;
         img.dataset.simple = item.simple;
+        img.dataset.source = "stall";
 
         img.addEventListener("dragstart", function(event){
           event.dataTransfer.setData("text/plain", item.simple);
+          event.dataTransfer.setData("source", "stall");
         });
 
         img.onclick = function(){
-          addToBagWithoutChecking(item.simple);
+          addToBag(item.simple);
         };
 
         compartment.appendChild(img);
@@ -1340,12 +1355,19 @@ function renderBag(){
     event.preventDefault();
 
     const simple = event.dataTransfer.getData("text/plain");
+    const source = event.dataTransfer.getData("source");
+    const bagItemId = event.dataTransfer.getData("bagItemId");
 
-    addToBagWithoutChecking(simple);
+    if(source === "bag"){
+      removeBagItem(bagItemId);
+      return;
+    }
+
+    addToBag(simple);
   };
 }
 
-function addToBagWithoutChecking(simple){
+function addToBag(simple){
   const item = SHOP_ITEMS.find(function(shopItem){
     return shopItem.simple === simple;
   });
@@ -1374,15 +1396,69 @@ function addToBagWithoutChecking(simple){
 function addBagItem(item){
   const bag = document.getElementById("bagDrop");
   const img = document.createElement("img");
+  const bagItemId = "bag-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
 
   img.className = "bagItem";
   img.src = item.img;
   img.alt = "";
+  img.draggable = true;
+  img.dataset.simple = item.simple;
+  img.dataset.bagItemId = bagItemId;
 
-  img.style.left = (28 + Math.random() * 46) + "%";
-  img.style.top = (42 + Math.random() * 34) + "%";
+  const existingItems = bag.querySelectorAll(".bagItem").length;
+  const columns = 5;
+  const row = Math.floor(existingItems / columns);
+  const column = existingItems % columns;
+
+  img.style.left = (22 + column * 12) + "%";
+  img.style.top = (42 + row * 13) + "%";
+
+  img.addEventListener("dragstart", function(event){
+    event.dataTransfer.setData("text/plain", item.simple);
+    event.dataTransfer.setData("source", "bag");
+    event.dataTransfer.setData("bagItemId", bagItemId);
+  });
+
+  img.onclick = function(){
+    removeBagItem(bagItemId);
+  };
 
   bag.appendChild(img);
+}
+
+function removeBagItem(bagItemId){
+  const bagItem = document.querySelector('[data-bag-item-id="' + bagItemId + '"]');
+
+  if(!bagItem){
+    return;
+  }
+
+  const simple = bagItem.dataset.simple;
+
+  if(shoppingCounts[simple]){
+    shoppingCounts[simple].found = Math.max(0, shoppingCounts[simple].found - 1);
+  }
+
+  bagItem.remove();
+
+  reorganiseBagItems();
+
+  const message = document.getElementById("shopMessage");
+  message.textContent = "";
+  message.className = "shopMessage";
+}
+
+function reorganiseBagItems(){
+  const bagItems = document.querySelectorAll(".bagItem");
+  const columns = 5;
+
+  bagItems.forEach(function(img, index){
+    const row = Math.floor(index / columns);
+    const column = index % columns;
+
+    img.style.left = (22 + column * 12) + "%";
+    img.style.top = (42 + row * 13) + "%";
+  });
 }
 
 function checkShoppingAnswer(){
@@ -1429,6 +1505,9 @@ document.getElementById("listenReplay").onclick = function(){
 
 document.getElementById("checkShopping").onclick = function(){
   checkShoppingAnswer();
+};
+  document.getElementById("replayShopping").onclick = function(){
+  resetShopping();
 };
 
 resetListen();
