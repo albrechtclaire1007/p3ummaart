@@ -27,10 +27,6 @@
   --shadow:0 10px 24px rgba(0,0,0,.08);
   --pad:clamp(10px,2.2vw,16px);
   --r:18px;
-
-  --iconArrow:"https://i.postimg.cc/QBYTSN08/p3arrow.png";
-  --iconPlay:"https://i.postimg.cc/ZB9yQkMt/p3play.png";
-  --iconReplay:"https://i.postimg.cc/ft30P4rQ/p3replay.png";
 }
 
 *{
@@ -385,16 +381,16 @@ body{
   background:var(--bad);
 }
 
-.shopGame{
+.shopLayout{
   display:grid;
-  grid-template-columns:1fr 290px;
-  gap:18px;
-  align-items:start;
+  gap:14px;
 }
 
-.shopLeft{
+.shopTop{
   display:grid;
-  gap:12px;
+  grid-template-columns:1fr 260px;
+  gap:18px;
+  align-items:start;
 }
 
 .stalls{
@@ -405,93 +401,111 @@ body{
 
 .stall{
   position:relative;
-  aspect-ratio:1 / 1.05;
+  aspect-ratio:1 / 0.82;
   background-image:url("https://i.postimg.cc/mk0ySLWc/marketstall.png");
   background-size:contain;
   background-repeat:no-repeat;
   background-position:center;
 }
 
-.stallItem{
+.stallCompartment{
   position:absolute;
-  width:26%;
-  height:22%;
+  width:34%;
+  height:23%;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+}
+
+.stallCompartment[data-slot="0"]{
+  left:16%;
+  top:42%;
+}
+
+.stallCompartment[data-slot="1"]{
+  left:52%;
+  top:42%;
+}
+
+.stallCompartment[data-slot="2"]{
+  left:16%;
+  top:64%;
+}
+
+.stallCompartment[data-slot="3"]{
+  left:52%;
+  top:64%;
+}
+
+.shopItem{
+  width:34px;
+  height:34px;
   object-fit:contain;
   cursor:grab;
-  z-index:2;
-  filter:drop-shadow(0 4px 4px rgba(0,0,0,.18));
-}
-
-.stallItem[data-slot="0"]{
-  left:18%;
-  top:43%;
-}
-
-.stallItem[data-slot="1"]{
-  left:54%;
-  top:43%;
-}
-
-.stallItem[data-slot="2"]{
-  left:18%;
-  top:65%;
-}
-
-.stallItem[data-slot="3"]{
-  left:54%;
-  top:65%;
-}
-
-.shopRight{
-  display:grid;
-  gap:12px;
+  margin:-2px;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.18));
 }
 
 .listBox{
-  position:relative;
-  min-height:260px;
+  min-height:250px;
   background-image:url("https://i.postimg.cc/Y927p7Vq/shopping-list.png");
   background-size:contain;
   background-repeat:no-repeat;
   background-position:center top;
-  padding:72px 35px 30px;
+  padding:76px 28px 20px;
 }
 
 .listBox ul{
   margin:0;
   padding-left:22px;
-  font-size:clamp(1rem,2vw,1.3rem);
-  line-height:1.5;
+  font-size:clamp(1rem,2vw,1.25rem);
+  line-height:1.55;
 }
 
 .bagDrop{
+  justify-self:center;
   position:relative;
-  min-height:250px;
+  width:min(300px,70vw);
+  height:230px;
   background-image:url("https://i.postimg.cc/mg10Rkr2/opt-1250w.png");
   background-size:contain;
   background-repeat:no-repeat;
   background-position:center;
-  border:3px dashed rgba(77,144,205,.55);
-  border-radius:22px;
-}
-
-.bagDrop.ready{
-  background-color:rgba(183,240,200,.35);
 }
 
 .bagItem{
   position:absolute;
-  width:55px;
-  height:55px;
+  width:48px;
+  height:48px;
   object-fit:contain;
   pointer-events:none;
   filter:drop-shadow(0 3px 3px rgba(0,0,0,.18));
 }
 
+.checkBtn{
+  justify-self:center;
+  border:none;
+  border-radius:999px;
+  background:#62c96f;
+  color:#fff;
+  font-family:'Schoulschrëft', Arial, sans-serif;
+  font-size:clamp(1.4rem,3vw,2rem);
+  padding:12px 44px;
+  cursor:pointer;
+  box-shadow:0 6px 0 #3da94d;
+}
+
+.checkBtn:active{
+  transform:translateY(3px);
+  box-shadow:0 3px 0 #3da94d;
+}
+
 .shopMessage{
   text-align:center;
-  font-size:clamp(1.2rem,2.5vw,1.6rem);
-  min-height:32px;
+  font-size:clamp(1.3rem,2.5vw,1.8rem);
+  min-height:34px;
 }
 
 .shopMessage.ok{
@@ -519,12 +533,17 @@ body{
     grid-template-columns:1fr;
   }
 
-  .shopGame{
+  .shopTop{
     grid-template-columns:1fr;
   }
 
   .stalls{
     grid-template-columns:1fr;
+  }
+
+  .listBox{
+    justify-self:center;
+    width:260px;
   }
 }
 </style>
@@ -582,19 +601,22 @@ body{
   </div>
 
   <div class="card screen" id="screenShopping">
-    <div class="shopGame">
-      <div class="shopLeft">
+    <div class="shopLayout">
+      <div class="shopTop">
         <div class="stalls" id="stalls"></div>
-        <div class="shopMessage" id="shopMessage"></div>
-      </div>
 
-      <div class="shopRight">
         <div class="listBox">
           <ul id="shoppingList"></ul>
         </div>
-
-        <div class="bagDrop" id="bagDrop"></div>
       </div>
+
+      <div class="bagDrop" id="bagDrop"></div>
+
+      <button class="checkBtn" id="checkShopping">
+        ✓ Kucken
+      </button>
+
+      <div class="shopMessage" id="shopMessage"></div>
     </div>
   </div>
 </div>
@@ -790,7 +812,7 @@ let pluralIndex = 0;
 
 let shoppingTargets = [];
 let shoppingCounts = {};
-let shoppingDone = 0;
+let shoppingVisibleItems = [];
 
 function shuffle(array){
   const copy = [...array];
@@ -1203,10 +1225,30 @@ function checkPluralAnswer(button, optionText, item){
 
 /* ===== GAME 5: D’AKAFSLËSCHT ===== */
 
+function quantityText(quantity, item){
+  if(quantity === 1){
+    if(item.gender === "f"){
+      return "eng " + item.simple;
+    }
+
+    return "een " + item.simple;
+  }
+
+  if(quantity === 2){
+    if(item.gender === "f"){
+      return "zwou " + item.plural;
+    }
+
+    return "zwee " + item.plural;
+  }
+
+  return NUMBER_WORDS[quantity] + " " + item.plural;
+}
+
 function resetShopping(){
-  shoppingTargets = shuffle(SHOP_ITEMS).slice(0, 4);
   shoppingCounts = {};
-  shoppingDone = 0;
+  shoppingVisibleItems = shuffle(SHOP_ITEMS).slice(0, 12);
+  shoppingTargets = shuffle(shoppingVisibleItems).slice(0, 4);
 
   shoppingTargets.forEach(function(item){
     shoppingCounts[item.simple] = {
@@ -1234,7 +1276,7 @@ function renderShoppingList(){
     const entry = document.createElement("li");
     const quantity = shoppingCounts[item.simple].needed;
 
-    entry.textContent = NUMBER_WORDS[quantity] + " " + item.plural;
+    entry.textContent = quantityText(quantity, item);
 
     list.appendChild(entry);
   });
@@ -1245,45 +1287,40 @@ function renderStalls(){
 
   stalls.innerHTML = "";
 
-  const missing = shoppingTargets[Math.floor(Math.random() * shoppingTargets.length)];
-  const visibleTargets = shoppingTargets.filter(function(item){
-    return item.simple !== missing.simple;
-  });
-
-  let fillers = shuffle(SHOP_ITEMS.filter(function(item){
-    return !shoppingTargets.some(function(target){
-      return target.simple === item.simple;
-    });
-  })).slice(0, 9);
-
-  const allVisible = shuffle([...visibleTargets, ...fillers]).slice(0, 12);
-
   for(let stallIndex = 0; stallIndex < 3; stallIndex++){
     const stall = document.createElement("div");
 
     stall.className = "stall";
 
-    const stallItems = allVisible.slice(stallIndex * 4, stallIndex * 4 + 4);
+    const stallItems = shoppingVisibleItems.slice(stallIndex * 4, stallIndex * 4 + 4);
 
     stallItems.forEach(function(item, slotIndex){
-      const img = document.createElement("img");
+      const compartment = document.createElement("div");
 
-      img.className = "stallItem";
-      img.src = item.img;
-      img.alt = "";
-      img.draggable = true;
-      img.dataset.simple = item.simple;
-      img.dataset.slot = slotIndex;
+      compartment.className = "stallCompartment";
+      compartment.dataset.slot = slotIndex;
 
-      img.addEventListener("dragstart", function(event){
-        event.dataTransfer.setData("text/plain", item.simple);
-      });
+      for(let copyIndex = 0; copyIndex < 8; copyIndex++){
+        const img = document.createElement("img");
 
-      img.onclick = function(){
-        tryAddToBag(item.simple);
-      };
+        img.className = "shopItem";
+        img.src = item.img;
+        img.alt = "";
+        img.draggable = true;
+        img.dataset.simple = item.simple;
 
-      stall.appendChild(img);
+        img.addEventListener("dragstart", function(event){
+          event.dataTransfer.setData("text/plain", item.simple);
+        });
+
+        img.onclick = function(){
+          addToBagWithoutChecking(item.simple);
+        };
+
+        compartment.appendChild(img);
+      }
+
+      stall.appendChild(compartment);
     });
 
     stalls.appendChild(stall);
@@ -1297,58 +1334,41 @@ function renderBag(){
 
   bag.ondragover = function(event){
     event.preventDefault();
-    bag.classList.add("ready");
-  };
-
-  bag.ondragleave = function(){
-    bag.classList.remove("ready");
   };
 
   bag.ondrop = function(event){
     event.preventDefault();
-    bag.classList.remove("ready");
 
     const simple = event.dataTransfer.getData("text/plain");
 
-    tryAddToBag(simple);
+    addToBagWithoutChecking(simple);
   };
 }
 
-function tryAddToBag(simple){
-  const message = document.getElementById("shopMessage");
+function addToBagWithoutChecking(simple){
+  const item = SHOP_ITEMS.find(function(shopItem){
+    return shopItem.simple === simple;
+  });
 
-  if(!shoppingCounts[simple]){
-    message.textContent = "Dat steet net op der Lëscht.";
-    message.className = "shopMessage bad";
+  if(!item){
     return;
   }
 
-  if(shoppingCounts[simple].found >= shoppingCounts[simple].needed){
-    message.textContent = "Genuch!";
-    message.className = "shopMessage bad";
-    return;
+  if(!shoppingCounts[simple]){
+    shoppingCounts[simple] = {
+      item:item,
+      needed:0,
+      found:0
+    };
   }
 
   shoppingCounts[simple].found++;
-  shoppingDone++;
 
-  addBagItem(shoppingCounts[simple].item);
+  addBagItem(item);
 
-  message.textContent = "Gutt!";
-  message.className = "shopMessage ok";
-
-  const totalNeeded = shoppingTargets.reduce(function(sum, item){
-    return sum + shoppingCounts[item.simple].needed;
-  }, 0);
-
-  if(shoppingDone >= totalNeeded){
-    message.textContent = "Fäerdeg!";
-    message.className = "shopMessage ok";
-
-    setTimeout(function(){
-      resetShopping();
-    }, 1200);
-  }
+  const message = document.getElementById("shopMessage");
+  message.textContent = "";
+  message.className = "shopMessage";
 }
 
 function addBagItem(item){
@@ -1359,10 +1379,34 @@ function addBagItem(item){
   img.src = item.img;
   img.alt = "";
 
-  img.style.left = (35 + Math.random() * 40) + "%";
-  img.style.top = (45 + Math.random() * 28) + "%";
+  img.style.left = (28 + Math.random() * 46) + "%";
+  img.style.top = (42 + Math.random() * 34) + "%";
 
   bag.appendChild(img);
+}
+
+function checkShoppingAnswer(){
+  const message = document.getElementById("shopMessage");
+
+  const correctTargets = shoppingTargets.every(function(item){
+    return shoppingCounts[item.simple].found === shoppingCounts[item.simple].needed;
+  });
+
+  const noExtraItems = Object.keys(shoppingCounts).every(function(simple){
+    return shoppingCounts[simple].needed > 0 || shoppingCounts[simple].found === 0;
+  });
+
+  if(correctTargets && noExtraItems){
+    message.textContent = "Richteg!";
+    message.className = "shopMessage ok";
+
+    setTimeout(function(){
+      resetShopping();
+    }, 1200);
+  }else{
+    message.textContent = "Kuck nach eng Kéier.";
+    message.className = "shopMessage bad";
+  }
 }
 
 /* ===== BUTTONS ===== */
@@ -1381,6 +1425,10 @@ document.getElementById("listenPlay").onclick = function(){
 
 document.getElementById("listenReplay").onclick = function(){
   playListen();
+};
+
+document.getElementById("checkShopping").onclick = function(){
+  checkShoppingAnswer();
 };
 
 resetListen();
