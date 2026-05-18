@@ -480,7 +480,7 @@ body{
   width:48px;
   height:48px;
   object-fit:contain;
-  pointer-events:none;
+  pointer-events:auto;
   filter:drop-shadow(0 3px 3px rgba(0,0,0,.18));
 }
 .checkBtn{
@@ -1168,9 +1168,20 @@ function resetPlural(){
 function makePluralOptions(item){
   const options = new Set();
 
+  /*
+    Important: the correct answer must always stay in the option list.
+    Fake answers are generated only from the current word, not from other
+    vocabulary items, so children do not see plurals belonging to other words.
+  */
   options.add(item.plural);
-  options.add(item.simple);
-  options.add(item.simple + "en");
+
+  const fakeOptions = [
+    item.simple,
+    item.simple + "en",
+    item.simple + "er",
+    item.simple + "s",
+    item.simple + "n"
+  ];
 
   const vowelSwap = item.simple
     .replace("o", "ë")
@@ -1180,14 +1191,27 @@ function makePluralOptions(item){
     .replace("u", "ou")
     .replace("U", "Ou");
 
-  options.add(vowelSwap);
+  fakeOptions.push(vowelSwap);
+  fakeOptions.push(vowelSwap + "en");
+  fakeOptions.push(vowelSwap + "er");
 
-  while(options.size < 3){
-    const randomItem = ITEMS[Math.floor(Math.random() * ITEMS.length)];
-    options.add(randomItem.plural);
+  fakeOptions.forEach(function(option){
+    if(option && option !== item.plural){
+      options.add(option);
+    }
+  });
+
+  let optionList = [...options];
+
+  if(optionList.length < 3){
+    optionList.push(item.simple + "cher");
   }
 
-  return shuffle([...options]).slice(0, 3);
+  const wrongOptions = shuffle(optionList.filter(function(option){
+    return option !== item.plural;
+  })).slice(0, 2);
+
+  return shuffle([item.plural, ...wrongOptions]);
 }
 
 function renderPluralRound(){
