@@ -410,42 +410,35 @@ body{
 
 .stallCompartment{
   position:absolute;
-  width:34%;
-  height:23%;
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  justify-content:center;
-  gap:0;
+  top:57%;
+  width:18%;
+  height:22%;
+  display:grid;
+  place-items:center;
 }
 
 .stallCompartment[data-slot="0"]{
-  left:16%;
-  top:42%;
+  left:12%;
 }
 
 .stallCompartment[data-slot="1"]{
-  left:52%;
-  top:42%;
+  left:32%;
 }
 
 .stallCompartment[data-slot="2"]{
-  left:16%;
-  top:64%;
+  left:52%;
 }
 
 .stallCompartment[data-slot="3"]{
-  left:52%;
-  top:64%;
+  left:72%;
 }
 
 .shopItem{
-  width:34px;
-  height:34px;
+  width:58px;
+  height:58px;
   object-fit:contain;
   cursor:grab;
-  margin:-2px;
-  filter:drop-shadow(0 3px 3px rgba(0,0,0,.18));
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,.2));
 }
 
 .listBox{
@@ -1337,28 +1330,25 @@ function renderStalls(){
       compartment.dataset.slot = slotIndex;
       compartment.dataset.simple = item.simple;
 
-      for(let copyIndex = 0; copyIndex < 8; copyIndex++){
-        const img = document.createElement("img");
+      const img = document.createElement("img");
 
-        img.className = "shopItem";
-        img.src = item.img;
-        img.alt = "";
-        img.draggable = true;
-        img.dataset.simple = item.simple;
-        img.dataset.source = "stall";
+      img.className = "shopItem";
+      img.src = item.img;
+      img.alt = "";
+      img.draggable = true;
+      img.dataset.simple = item.simple;
+      img.dataset.source = "stall";
 
-        img.addEventListener("dragstart", function(event){
-          event.dataTransfer.setData("text/plain", item.simple);
-          event.dataTransfer.setData("source", "stall");
-        });
+      img.addEventListener("dragstart", function(event){
+        event.dataTransfer.setData("text/plain", item.simple);
+        event.dataTransfer.setData("source", "stall");
+      });
 
-        img.onclick = function(){
-          addToBag(item.simple);
-        };
+      img.onclick = function(){
+        addToBag(item.simple);
+      };
 
-        compartment.appendChild(img);
-      }
-
+      compartment.appendChild(img);
       stall.appendChild(compartment);
     });
 
